@@ -1,0 +1,47 @@
+{
+    // VS Code launch configurations that run React Native CLI via npx in the integrated terminal.
+    // These avoid relying on the React Native extension and help prevent spawn EINVAL issues
+    // when VS Code tries to invoke external tools.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Start Metro (packager)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npx.cmd",
+            "runtimeArgs": [
+                "react-native",
+                "start"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Run Android (React Native CLI)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npx.cmd",
+            "runtimeArgs": [
+                "react-native",
+                "run-android"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Run iOS (React Native CLI - macOS only)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npx",
+            "runtimeArgs": [
+                "react-native",
+                "run-ios"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}
