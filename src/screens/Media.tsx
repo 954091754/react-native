@@ -1,11 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-export default function Me() {
+export default function Media() {
   return (
     <View style={styles.center}>
-      <Text style={styles.title}>我的</Text>
-      <Text style={styles.body}>个人信息与设置</Text>
+      <Text style={styles.title}>书影音</Text>
+      <Text style={styles.body}>书籍、电影与音乐的推荐与分类</Text>
     </View>
   );
 }

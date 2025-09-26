@@ -2,9 +2,10 @@ import React, {useState} from 'react';
 import {SafeAreaView, StatusBar, View, StyleSheet} from 'react-native';
 import TabBar, {TabKey} from '../components/TabBar';
 import Home from '../screens/Home';
-import Contacts from '../screens/Contacts';
+import Media from '../screens/Media';
 import Moments from '../screens/Moments';
-import Me from '../screens/Me';
+import Market from '../screens/Market';
+import Profile from '../screens/Profile';
 
 export default function RootPage() {
   const [active, setActive] = useState<TabKey>('home');
@@ -15,9 +16,10 @@ export default function RootPage() {
       <View style={styles.container}>
         <View style={styles.content}>
           {active === 'home' && <Home />}
-          {active === 'contacts' && <Contacts />}
+          {active === 'media' && <Media />}
           {active === 'moments' && <Moments />}
-          {active === 'me' && <Me />}
+          {active === 'market' && <Market />}
+          {active === 'profile' && <Profile />}
         </View>
 
         <TabBar active={active} onChange={k => setActive(k)} />

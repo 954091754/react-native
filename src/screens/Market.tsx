@@ -1,11 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-export default function Contacts() {
+export default function Market() {
   return (
     <View style={styles.center}>
-      <Text style={styles.title}>通讯录</Text>
-      <Text style={styles.body}>好友列表 / 联系人</Text>
+      <Text style={styles.title}>市集</Text>
+      <Text style={styles.body}>这里是市集页面。</Text>
     </View>
   );
 }

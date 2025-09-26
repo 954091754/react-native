@@ -1,11 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-export default function Moments() {
+export default function Profile() {
   return (
     <View style={styles.center}>
-      <Text style={styles.title}>小组</Text>
-      <Text style={styles.body}>动态流 / 小组</Text>
+      <Text style={styles.title}>我</Text>
+      <Text style={styles.body}>个人中心 / 设置</Text>
     </View>
   );
 }
