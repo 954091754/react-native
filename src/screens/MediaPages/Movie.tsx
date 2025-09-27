@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, FlatList } from 'react-native';
-import MoviePageItemStars from '../../component/MoviePageItemStars';
+import MoviePageItemStars from '../../components/MoviePageItemStars';
 
 const { width } = Dimensions.get('window');
 const BANNER_HEIGHT = Math.round(width * 0.5);
@@ -49,12 +49,19 @@ export default function MoviePage() {
         setCurrentIndex(index);
     };
 
-    // 生成 50 个假电影数据，每个 item 随机一张图片
-    const movies = Array.from({ length: 50 }, (_, i) => ({
-        id: i.toString(),
-        title: `电影 ${i + 1}`,
-        image: movieImages[Math.floor(Math.random() * movieImages.length)],
-    }));
+    const randomScore = () => {
+        const steps = Math.floor(Math.random() * 21); // 0 ~ 20
+        return steps * 0.5; // 0, 0.5, 1.0, ..., 10.0
+    };
+
+    const [movies] = useState(() =>
+        Array.from({ length: 50 }, (_, i) => ({
+            id: i.toString(),
+            title: `电影 ${i + 1}`,
+            image: movieImages[Math.floor(Math.random() * movieImages.length)],
+            score: randomScore(),
+        }))
+    );
 
     const renderMovieItem = ({ item, index }: any) => {
         const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
@@ -62,7 +69,7 @@ export default function MoviePage() {
             <View style={[styles.movieItem, { marginRight: isLastInRow ? 0 : ITEM_SPACING }]}>
                 <Image source={item.image} style={styles.moviePoster} resizeMode="cover" />
                 <Text style={styles.movieTitle}>{item.title}</Text>
-                <MoviePageItemStars score={6.3} size={20} />
+                <MoviePageItemStars score={parseFloat(item.score)} size={20} />
             </View>
         );
     };
