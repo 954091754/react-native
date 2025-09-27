@@ -1,21 +1,34 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, FlatList } from 'react-native';
 
 const { width } = Dimensions.get('window');
 const BANNER_HEIGHT = Math.round(width * 0.5);
 
+const PADDING_HORIZONTAL = 12; // 列表左右 padding
+const ITEM_SPACING = 10; // item 间隔
+const NUM_COLUMNS = 3;
+
+// 每个 item 宽度 = 屏幕宽度 - padding*2 - 间距总和 / 3
+const ITEM_WIDTH = (width - PADDING_HORIZONTAL * 2 - ITEM_SPACING * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
+
+// 本地图片数组
+const movieImages = [
+    require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_blsj.jpeg'),
+    require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_pfzy.jpeg'),
+    require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_qz.jpeg'),
+];
+
 export default function MoviePage() {
     const banners = [
-        require('../../assets/images/banner_blsj.jpeg'),
-        require('../../assets/images/banner_pfzy.jpeg'),
-        require('../../assets/images/banner_qz.jpeg'),
+        require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_blsj.jpeg'),
+        require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_pfzy.jpeg'),
+        require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_qz.jpeg'),
     ];
 
     const scrollRef = useRef<any>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedTab, setSelectedTab] = useState(0);
 
-    // Auto-advance every 3 seconds
     useEffect(() => {
         const id = setInterval(() => {
             setCurrentIndex(prev => {
@@ -35,30 +48,49 @@ export default function MoviePage() {
         setCurrentIndex(index);
     };
 
+    // 生成 50 个假电影数据，每个 item 随机一张图片
+    const movies = Array.from({ length: 50 }, (_, i) => ({
+        id: i.toString(),
+        title: `电影 ${i + 1}`,
+        image: movieImages[Math.floor(Math.random() * movieImages.length)],
+    }));
+
+    const renderMovieItem = ({ item, index }: any) => {
+        const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
+        return (
+            <View style={[styles.movieItem, { marginRight: isLastInRow ? 0 : ITEM_SPACING }]}>
+                <Image source={item.image} style={styles.moviePoster} resizeMode="cover" />
+                <Text style={styles.movieTitle}>{item.title}</Text>
+            </View>
+        );
+    };
+
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 16 }}>
+            {/* 功能区 */}
             <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.actionItem} onPress={() => { /* TODO: navigate or show search */ }} accessibilityRole="button">
+                <TouchableOpacity style={styles.actionItem} accessibilityRole="button">
                     <Text style={styles.actionIcon}>🔍</Text>
                     <Text style={styles.actionLabel}>找电影</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionItem} onPress={() => { /* TODO: open charts */ }} accessibilityRole="button">
+                <TouchableOpacity style={styles.actionItem} accessibilityRole="button">
                     <Text style={styles.actionIcon}>📈</Text>
                     <Text style={styles.actionLabel}>豆瓣榜单</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionItem} onPress={() => { /* TODO: guess feature */ }} accessibilityRole="button">
+                <TouchableOpacity style={styles.actionItem} accessibilityRole="button">
                     <Text style={styles.actionIcon}>🎲</Text>
                     <Text style={styles.actionLabel}>豆瓣猜</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionItem} onPress={() => { /* TODO: ticket list */ }} accessibilityRole="button">
+                <TouchableOpacity style={styles.actionItem} accessibilityRole="button">
                     <Text style={styles.actionIcon}>🎟️</Text>
                     <Text style={styles.actionLabel}>豆瓣票单</Text>
                 </TouchableOpacity>
             </View>
 
+            {/* 轮播图 */}
             <View style={styles.bannerContainer}>
                 <ScrollView
                     ref={scrollRef}
@@ -73,35 +105,51 @@ export default function MoviePage() {
                 </ScrollView>
             </View>
 
+            {/* 轮播点 */}
             <View style={styles.dotsContainer}>
                 {banners.map((_, i) => (
                     <View key={i} style={[styles.dot, i === currentIndex && styles.activeDot]} />
                 ))}
             </View>
 
+            {/* Tabs */}
             <View style={styles.tabWrapper}>
                 <View style={styles.tabsLeft}>
-                    <TouchableOpacity style={[styles.tabItem, selectedTab === 0 && styles.tabItemActive]} onPress={() => setSelectedTab(0)}>
+                    <TouchableOpacity
+                        style={[styles.tabItem, selectedTab === 0 && styles.tabItemActive]}
+                        onPress={() => setSelectedTab(0)}
+                    >
                         <Text style={[styles.tabText, selectedTab === 0 && styles.tabTextActive]}>影院热映</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.tabItem, selectedTab === 1 && styles.tabItemActive]} onPress={() => setSelectedTab(1)}>
+                    <TouchableOpacity
+                        style={[styles.tabItem, selectedTab === 1 && styles.tabItemActive]}
+                        onPress={() => setSelectedTab(1)}
+                    >
                         <Text style={[styles.tabText, selectedTab === 1 && styles.tabTextActive]}>即将上映</Text>
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.tabRight} onPress={() => { /* TODO: handle "all" action */ }} accessibilityRole="button">
+                <TouchableOpacity style={styles.tabRight} accessibilityRole="button">
                     <Text style={styles.allText}>全部 &gt;</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+
+            {/* 电影列表 */}
+            <FlatList
+                data={movies}
+                keyExtractor={(item) => item.id}
+                renderItem={renderMovieItem}
+                numColumns={NUM_COLUMNS}
+                scrollEnabled={false} // 禁止 FlatList 内部滚动
+                contentContainerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}
+            />
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: '#fff' },
-    title: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
-    body: { fontSize: 14, color: '#666' },
+    container: { flex: 1, backgroundColor: '#fff' },
     bannerContainer: {
         width: '100%',
         height: BANNER_HEIGHT,
@@ -185,5 +233,22 @@ const styles = StyleSheet.create({
     allText: {
         color: '#666',
         fontSize: 13,
+    },
+    movieItem: {
+        width: ITEM_WIDTH,
+        alignItems: 'flex-start', // 标题靠左
+        marginBottom: 12,
+    },
+    moviePoster: {
+        width: ITEM_WIDTH,
+        height: 150,
+        borderRadius: 6,
+        marginBottom: 6,
+    },
+    movieTitle: {
+        fontSize: 12,
+        color: '#333',
+        textAlign: 'left',
+        width: '100%',
     },
 });
