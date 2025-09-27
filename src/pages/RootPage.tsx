@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {SafeAreaView, StatusBar, View, StyleSheet} from 'react-native';
-import TabBar, {TabKey} from '../components/TabBar';
+import React, { useState } from 'react';
+import { SafeAreaView, StatusBar, View, StyleSheet } from 'react-native';
+import TabBar, { TabKey } from '../components/TabBar';
 import Home from '../screens/Home';
 import Media from '../screens/Media';
 import Moments from '../screens/Moments';
@@ -29,7 +29,7 @@ export default function RootPage() {
 }
 
 const styles = StyleSheet.create({
-  safe: {flex: 1, backgroundColor: '#fff'},
-  container: {flex: 1},
-  content: {flex: 1},
+  safe: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1 },
+  content: { flex: 1 },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 export default function Moments() {
   return (
@@ -11,7 +11,7 @@ export default function Moments() {
 }
 
 const styles = StyleSheet.create({
-  center: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  title: {fontSize: 24, fontWeight: '700', marginBottom: 8},
-  body: {fontSize: 14, color: '#666'},
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: '700', marginBottom: 8 },
+  body: { fontSize: 14, color: '#666' },
 });

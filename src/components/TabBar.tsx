@@ -22,8 +22,8 @@ export default function TabBar({
   return (
     <View style={styles.tabBar}>
       <TabButton label="首页" k="home" icon="⌂" />
-  <TabButton label="书影音" k="media" icon="♪" />
-  <TabButton label="小组" k="moments" icon="✿" />
+      <TabButton label="书影音" k="media" icon="♪" />
+      <TabButton label="小组" k="moments" icon="✿" />
       <TabButton label="市集" k="market" icon="✦" />
       <TabButton label="我" k="profile" icon="⚑" />
     </View>
