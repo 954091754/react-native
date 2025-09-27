@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, FlatList } from 'react-native';
+import MoviePageItemStars from '../../component/MoviePageItemStars';
 
 const { width } = Dimensions.get('window');
 const BANNER_HEIGHT = Math.round(width * 0.5);
@@ -61,6 +62,7 @@ export default function MoviePage() {
             <View style={[styles.movieItem, { marginRight: isLastInRow ? 0 : ITEM_SPACING }]}>
                 <Image source={item.image} style={styles.moviePoster} resizeMode="cover" />
                 <Text style={styles.movieTitle}>{item.title}</Text>
+                <MoviePageItemStars score={6.3} size={20} />
             </View>
         );
     };

@@ -1,5 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, Platform, ScrollView, TouchableOpacity, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import MoviePage from './MediaPages/Movie';
 import TVPage from './MediaPages/TV';
 import VarietyPage from './MediaPages/Variety';
@@ -16,7 +27,7 @@ export default function Media() {
   const [itemLayouts, setItemLayouts] = useState<{ x: number; width: number }[]>([]);
   const { width } = Dimensions.get('window');
 
-  // when selected changes, center the menu item if possible
+  // Center selected menu item
   useEffect(() => {
     if (!menuRef.current || !itemLayouts || itemLayouts.length === 0) return;
     const layout = itemLayouts[selected];
@@ -26,8 +37,19 @@ export default function Media() {
     menuRef.current.scrollTo({ x: scrollTo, animated: true });
   }, [selected, itemLayouts]);
 
+  // 页面列表
+  const pages = [
+    <MoviePage />,
+    <TVPage />,
+    <VarietyPage />,
+    <BookPage />,
+    <MusicPage />,
+    <LocalPage />,
+  ];
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}>
+      {/* 搜索栏 */}
       <View style={styles.searchWrap}>
         <TextInput
           value={query}
@@ -39,8 +61,14 @@ export default function Media() {
         />
       </View>
 
+      {/* 菜单栏 */}
       <View style={styles.menuWrap}>
-        <ScrollView ref={menuRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.menuScroll}>
+        <ScrollView
+          ref={menuRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.menuScroll}
+        >
           {menuItems.map((item, idx) => {
             const active = idx === selected;
             return (
@@ -56,11 +84,9 @@ export default function Media() {
                   });
                 }}
                 onPress={() => {
-                  // scroll pages to index and set selected
                   pagesRef.current?.scrollTo({ x: idx * width, animated: true });
                   setSelected(idx);
                 }}
-                accessibilityRole="button"
               >
                 <Text style={[styles.menuText, active && styles.menuTextActive]}>{item}</Text>
               </TouchableOpacity>
@@ -69,6 +95,7 @@ export default function Media() {
         </ScrollView>
       </View>
 
+      {/* 横向分页 */}
       <ScrollView
         ref={pagesRef}
         horizontal
@@ -79,28 +106,18 @@ export default function Media() {
           const page = Math.round(x / width);
           setSelected(page);
         }}
-        style={styles.pagesWrap}
+        style={{ flex: 1 }}
       >
-        <View style={[styles.page, { width }]}>
-          <MoviePage />
-        </View>
-        <View style={[styles.page, { width }]}>
-          <TVPage />
-        </View>
-        <View style={[styles.page, { width }]}>
-          <VarietyPage />
-        </View>
-        <View style={[styles.page, { width }]}>
-          <BookPage />
-        </View>
-        <View style={[styles.page, { width }]}>
-          <MusicPage />
-        </View>
-        <View style={[styles.page, { width }]}>
-          <LocalPage />
-        </View>
+        {pages.map((PageComponent, idx) => (
+          <View key={idx} style={{ width, flex: 1 }}>
+            {/* 每个页面内部可以竖向滚动 */}
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+              {PageComponent}
+            </ScrollView>
+          </View>
+        ))}
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -138,9 +155,4 @@ const styles = StyleSheet.create({
   },
   menuText: { fontSize: 14, color: '#333' },
   menuTextActive: { color: '#007AFF', fontWeight: '600' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 8 },
-  body: { fontSize: 14, color: '#666' },
-  pagesWrap: { flex: 1 },
-  page: { flex: 1 },
 });
