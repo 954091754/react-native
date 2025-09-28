@@ -8,9 +8,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+  Animated,
 } from 'react-native';
+
 import MoviePage from './MediaPages/Movie';
 import TVPage from './MediaPages/TV';
 import VarietyPage from './MediaPages/Variety';
@@ -18,26 +18,19 @@ import BookPage from './MediaPages/Book';
 import MusicPage from './MediaPages/Music';
 import LocalPage from './MediaPages/Local';
 
+const { width, height } = Dimensions.get('window');
+
 export default function Media() {
-  const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState(0);
   const menuItems = ['电影', '电视', '综艺', '读书', '音乐', '同城'];
+  const [selected, setSelected] = useState(0);
   const pagesRef = useRef<ScrollView | null>(null);
   const menuRef = useRef<ScrollView | null>(null);
   const [itemLayouts, setItemLayouts] = useState<{ x: number; width: number }[]>([]);
-  const { width } = Dimensions.get('window');
 
-  // Center selected menu item
-  useEffect(() => {
-    if (!menuRef.current || !itemLayouts || itemLayouts.length === 0) return;
-    const layout = itemLayouts[selected];
-    if (!layout) return;
-    const menuWidth = Dimensions.get('window').width;
-    const scrollTo = Math.max(0, layout.x + layout.width / 2 - menuWidth / 2);
-    menuRef.current.scrollTo({ x: scrollTo, animated: true });
-  }, [selected, itemLayouts]);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const SEARCH_HEIGHT = Platform.OS === 'android' ? 60 : 80;
+  const MENU_HEIGHT = 48;
 
-  // 页面列表
   const pages = [
     <MoviePage />,
     <TVPage />,
@@ -47,22 +40,74 @@ export default function Media() {
     <LocalPage />,
   ];
 
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}>
-      {/* 搜索栏 */}
-      <View style={styles.searchWrap}>
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="用一部电影来形容您的2025"
-          placeholderTextColor="#999"
-          style={styles.searchInput}
-          returnKeyType="search"
-        />
-      </View>
+  // 菜单居中滚动
+  useEffect(() => {
+    if (!menuRef.current || !itemLayouts || itemLayouts.length === 0) return;
+    const layout = itemLayouts[selected];
+    if (!layout) return;
+    const scrollTo = Math.max(0, layout.x + layout.width / 2 - width / 2);
+    menuRef.current.scrollTo({ x: scrollTo, animated: true });
+  }, [selected, itemLayouts]);
 
-      {/* 菜单栏 */}
-      <View style={styles.menuWrap}>
+  // Animated 样式
+  const searchOpacity = scrollY.interpolate({
+    inputRange: [0, SEARCH_HEIGHT],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const menuTranslateY = scrollY.interpolate({
+    inputRange: [0, SEARCH_HEIGHT],
+    outputRange: [SEARCH_HEIGHT, 0],
+    extrapolate: 'clamp',
+  });
+
+  return (
+    <View style={styles.container}>
+      {/* 主 ScrollView */}
+      <Animated.ScrollView
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true } // ✅ 使用 transform
+        )}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        {/* 搜索栏 */}
+        <Animated.View style={[styles.searchWrap, { opacity: searchOpacity }]}>
+          <TextInput
+            placeholder="用一部电影来形容您的2025"
+            placeholderTextColor="#999"
+            style={styles.searchInput}
+            returnKeyType="search"
+          />
+        </Animated.View>
+
+        {/* 占位菜单栏 */}
+        <View style={{ height: MENU_HEIGHT }} />
+
+        {/* 页面内容 */}
+        {pages.map((PageComponent, idx) => (
+          <View key={idx} style={{ width, flex: 1 }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+              {PageComponent}
+            </ScrollView>
+          </View>
+        ))}
+      </Animated.ScrollView>
+
+      {/* 悬浮菜单栏 */}
+      <Animated.View
+        style={[
+          styles.menuWrap,
+          {
+            position: 'absolute',
+            zIndex: 999,
+            width: '100%',
+            transform: [{ translateY: menuTranslateY }], // ✅ 用 translateY 替代 top
+          },
+        ]}
+      >
         <ScrollView
           ref={menuRef}
           horizontal
@@ -93,31 +138,8 @@ export default function Media() {
             );
           })}
         </ScrollView>
-      </View>
-
-      {/* 横向分页 */}
-      <ScrollView
-        ref={pagesRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-          const x = e.nativeEvent.contentOffset.x;
-          const page = Math.round(x / width);
-          setSelected(page);
-        }}
-        style={{ flex: 1 }}
-      >
-        {pages.map((PageComponent, idx) => (
-          <View key={idx} style={{ width, flex: 1 }}>
-            {/* 每个页面内部可以竖向滚动 */}
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-              {PageComponent}
-            </ScrollView>
-          </View>
-        ))}
-      </ScrollView>
-    </ScrollView>
+      </Animated.View>
+    </View>
   );
 }
 
@@ -141,6 +163,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
     backgroundColor: '#fff',
+    height: 48,
+    justifyContent: 'center',
   },
   menuScroll: { paddingHorizontal: 8, alignItems: 'center' },
   menuItem: {
