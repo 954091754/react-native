@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 
 import MoviePage from './MediaPages/Movie';
@@ -62,16 +64,30 @@ export default function Media() {
     extrapolate: 'clamp',
   });
 
+  // 左右滑动联动菜单
+  const onHorizontalScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / width);
+    if (index !== selected) {
+      setSelected(index);
+    }
+  };
+
+  const scrollToPage = (idx: number) => {
+    pagesRef.current?.scrollTo({ x: idx * width, animated: true });
+    setSelected(idx);
+  };
+
   return (
     <View style={styles.container}>
-      {/* 主 ScrollView */}
+      {/* 主 ScrollView（纵向滚动） */}
       <Animated.ScrollView
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true } // ✅ 使用 transform
+          { useNativeDriver: true }
         )}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 20 : 0 }}
       >
         {/* 搜索栏 */}
         <Animated.View style={[styles.searchWrap, { opacity: searchOpacity }]}>
@@ -86,14 +102,22 @@ export default function Media() {
         {/* 占位菜单栏 */}
         <View style={{ height: MENU_HEIGHT }} />
 
-        {/* 页面内容 */}
-        {pages.map((PageComponent, idx) => (
-          <View key={idx} style={{ width, flex: 1 }}>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* 页面内容：水平滑动 */}
+        <ScrollView
+          ref={pagesRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onHorizontalScroll}
+          style={{ flex: 1 }}
+        >
+          {pages.map((PageComponent, idx) => (
+            <View key={idx} style={{ width, minHeight: height - SEARCH_HEIGHT - MENU_HEIGHT }}>
+              {/* 直接渲染页面，不用内层 ScrollView */}
               {PageComponent}
-            </ScrollView>
-          </View>
-        ))}
+            </View>
+          ))}
+        </ScrollView>
       </Animated.ScrollView>
 
       {/* 悬浮菜单栏 */}
@@ -104,7 +128,7 @@ export default function Media() {
             position: 'absolute',
             zIndex: 999,
             width: '100%',
-            transform: [{ translateY: menuTranslateY }], // ✅ 用 translateY 替代 top
+            transform: [{ translateY: menuTranslateY }],
           },
         ]}
       >
@@ -128,12 +152,11 @@ export default function Media() {
                     return copy;
                   });
                 }}
-                onPress={() => {
-                  pagesRef.current?.scrollTo({ x: idx * width, animated: true });
-                  setSelected(idx);
-                }}
+                onPress={() => scrollToPage(idx)}
               >
-                <Text style={[styles.menuText, active && styles.menuTextActive]}>{item}</Text>
+                <Text style={[styles.menuText, active && styles.menuTextActive]}>
+                  {item}
+                </Text>
               </TouchableOpacity>
             );
           })}
