@@ -8,16 +8,16 @@
 
 ## 演示与素材
 
-项目中包含若干用于 README 演示的图片与视频素材，存放在 `assets/images/`：
+项目中包含若干用于 README 演示的图片与视频素材，存放在 `src/assets/images/`：
 
-- `assets/images/splash_page.png`：启动页示例截图
-- `assets/images/book_videos_page.png`：书影音页面示例截图
-- `assets/images/detail_page.png`：详情页示例截图
+- `src/assets/images/splash_page.png`：启动页示例截图
+- `src/assets/images/book_videos_page.png`：书影音页面示例截图
+- `src/assets/images/detail_page.png`：详情页示例截图
 
 效果图演示：
 
-![启动页示例](assets/images/splash_page.png)
+![启动页示例](src/assets/images/splash_page.png)
 
-![书影音页面示例](assets/images/book_videos_page.png)
+![书影音页面示例](src/assets/images/book_videos_page.png)
 
-![详情页示例](assets/images/detail_page.png)
+![详情页示例](src/assets/images/detail_page.png)
