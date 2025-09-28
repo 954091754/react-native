@@ -1,5 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, FlatList } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    ScrollView,
+    Image,
+    Dimensions,
+    FlatList,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import MoviePageItemStars from '../../components/MoviePageItemStars';
 
 const { width } = Dimensions.get('window');
@@ -10,7 +21,16 @@ const ITEM_SPACING = 10; // item 间隔
 const NUM_COLUMNS = 3;
 
 // 每个 item 宽度 = 屏幕宽度 - padding*2 - 间距总和 / 3
-const ITEM_WIDTH = (width - PADDING_HORIZONTAL * 2 - ITEM_SPACING * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
+const ITEM_WIDTH =
+    (width - PADDING_HORIZONTAL * 2 - ITEM_SPACING * (NUM_COLUMNS - 1)) /
+    NUM_COLUMNS;
+
+// 定义导航参数类型
+type RootStackParamList = {
+    RootPage: undefined;
+    DetailPage: { movie: any };
+};
+type NavigationProp = StackNavigationProp<RootStackParamList, 'RootPage'>;
 
 // 本地图片数组
 const movieImages = [
@@ -20,6 +40,8 @@ const movieImages = [
 ];
 
 export default function MoviePage() {
+    const navigation = useNavigation<NavigationProp>();
+
     const banners = [
         require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_blsj.jpeg'),
         require('C:/Users/Administrator/Documents/react-native/src/assets/images/banner_pfzy.jpeg'),
@@ -32,7 +54,7 @@ export default function MoviePage() {
 
     useEffect(() => {
         const id = setInterval(() => {
-            setCurrentIndex(prev => {
+            setCurrentIndex((prev) => {
                 const next = (prev + 1) % banners.length;
                 if (scrollRef.current) {
                     scrollRef.current.scrollTo({ x: next * width, animated: true });
@@ -60,17 +82,28 @@ export default function MoviePage() {
             title: `电影 ${i + 1}`,
             image: movieImages[Math.floor(Math.random() * movieImages.length)],
             score: randomScore(),
-        }))
+        })),
     );
 
     const renderMovieItem = ({ item, index }: any) => {
         const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
         return (
-            <View style={[styles.movieItem, { marginRight: isLastInRow ? 0 : ITEM_SPACING }]}>
-                <Image source={item.image} style={styles.moviePoster} resizeMode="cover" />
+            <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.push('DetailPage', { movie: item })} // 👈 跳转
+                style={[
+                    styles.movieItem,
+                    { marginRight: isLastInRow ? 0 : ITEM_SPACING },
+                ]}
+            >
+                <Image
+                    source={item.image}
+                    style={styles.moviePoster}
+                    resizeMode="cover"
+                />
                 <Text style={styles.movieTitle}>{item.title}</Text>
                 <MoviePageItemStars score={parseFloat(item.score)} size={20} />
-            </View>
+            </TouchableOpacity>
         );
     };
 
@@ -109,7 +142,12 @@ export default function MoviePage() {
                     onMomentumScrollEnd={onMomentumScrollEnd}
                 >
                     {banners.map((src, i) => (
-                        <Image key={i} source={src} style={{ width, height: BANNER_HEIGHT }} resizeMode="cover" />
+                        <Image
+                            key={i}
+                            source={src}
+                            style={{ width, height: BANNER_HEIGHT }}
+                            resizeMode="cover"
+                        />
                     ))}
                 </ScrollView>
             </View>
@@ -117,7 +155,10 @@ export default function MoviePage() {
             {/* 轮播点 */}
             <View style={styles.dotsContainer}>
                 {banners.map((_, i) => (
-                    <View key={i} style={[styles.dot, i === currentIndex && styles.activeDot]} />
+                    <View
+                        key={i}
+                        style={[styles.dot, i === currentIndex && styles.activeDot]}
+                    />
                 ))}
             </View>
 
@@ -128,14 +169,28 @@ export default function MoviePage() {
                         style={[styles.tabItem, selectedTab === 0 && styles.tabItemActive]}
                         onPress={() => setSelectedTab(0)}
                     >
-                        <Text style={[styles.tabText, selectedTab === 0 && styles.tabTextActive]}>影院热映</Text>
+                        <Text
+                            style={[
+                                styles.tabText,
+                                selectedTab === 0 && styles.tabTextActive,
+                            ]}
+                        >
+                            影院热映
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         style={[styles.tabItem, selectedTab === 1 && styles.tabItemActive]}
                         onPress={() => setSelectedTab(1)}
                     >
-                        <Text style={[styles.tabText, selectedTab === 1 && styles.tabTextActive]}>即将上映</Text>
+                        <Text
+                            style={[
+                                styles.tabText,
+                                selectedTab === 1 && styles.tabTextActive,
+                            ]}
+                        >
+                            即将上映
+                        </Text>
                     </TouchableOpacity>
                 </View>
 
