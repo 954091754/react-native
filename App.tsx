@@ -33,7 +33,7 @@ export default function App(): JSX.Element {
         <Stack.Screen
           name="DetailPage"
           component={DetailPage}
-          options={{ title: '详情' }}
+          options={{ title: '详情', headerTitleAlign: 'center' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

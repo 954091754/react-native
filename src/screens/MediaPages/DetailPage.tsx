@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MoviePageItemStars from '../../components/MoviePageItemStars';
 
 // 使用 require 方式，TS 不会报错
@@ -9,7 +9,7 @@ export default function DetailPage({ route }: any) {
     const { movie } = route.params;
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
             {/* 顶部区域：横向布局 */}
             <View style={styles.topView}>
                 {/* 左边：海报 */}
@@ -19,9 +19,6 @@ export default function DetailPage({ route }: any) {
                 <View style={styles.infoContainer}>
                     <Text style={styles.title}>{movie.title}</Text>
                     <Text style={styles.year}>{movie.year || '年份：未知'}</Text>
-                    <Text style={styles.desc} numberOfLines={3}>
-                        {movie.desc || '暂无简介'}
-                    </Text>
                     <View style={styles.scoreRow}>
                         <MoviePageItemStars score={movie.score} size={20} />
                         <Text style={styles.score}>{movie.score}</Text>
@@ -40,22 +37,20 @@ export default function DetailPage({ route }: any) {
                     </View>
                 </View>
             </View>
-        </View>
+
+            {/* 分割线 */}
+            <View style={styles.divider} />
+
+            {/* 剧情简介 */}
+            <Text style={styles.sectionTitle}>剧情简介</Text>
+            <Text style={styles.desc}>{movie.desc || '这里是完整的剧情简介占位文本。你可以把真实的电影简介、演职员信息、时长、类型等放在这里。 目前用于演示页面布局，支持多行显示并随页面滚动查看。'}</Text>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    scoreRow: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    score: {
-        fontSize: 14,
-        marginLeft: 8,
-    },
     container: {
         flex: 1,
-        padding: 16,
         backgroundColor: '#fff',
     },
     topView: {
@@ -82,9 +77,13 @@ const styles = StyleSheet.create({
         color: '#666',
         marginBottom: 6,
     },
-    desc: {
+    scoreRow: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    score: {
         fontSize: 14,
-        color: '#333'
+        marginLeft: 8,
     },
     actionsRow: {
         flexDirection: 'row',
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
     },
     actionBtn: {
         flex: 1,
-        flexDirection: 'row',    // icon + text 横向排列
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
@@ -103,5 +102,20 @@ const styles = StyleSheet.create({
     actionText: {
         fontSize: 14,
         color: '#007AFF',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#eee',
+        marginVertical: 16,
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '500',
+        marginBottom: 8,
+    },
+    desc: {
+        fontSize: 14,
+        color: '#333',
+        lineHeight: 20,
     },
 });
