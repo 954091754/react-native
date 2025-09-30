@@ -1,3 +1,7 @@
+Flutter版：https://github.com/954091754/flutter
+
+鸿蒙版：https://github.com/954091754/harmony
+
 ## 项目简介（React-Native练手）
 
 `galaxy` 是一个基于 React-Native 的移动端示例应用，参考了豆瓣类的书影音界面，包含首页、列表、详情页和底部导航等常见布局。
